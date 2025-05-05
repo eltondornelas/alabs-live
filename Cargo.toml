@@ -9,5 +9,6 @@ edition = "2024"
 members = [ 
     "session1/authentication",
     "session1/hello_world",
+    "session1/login",
     "session1/variables",
 ]
