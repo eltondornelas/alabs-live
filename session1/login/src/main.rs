@@ -11,7 +11,7 @@ fn main() {
         let password: String = read_line();
 
         match login(&username, &password) {
-            // LoginAction::Granted(authentication::LoginRole::Admin) => println!("Admin"),            
+            // LoginAction::Granted(authentication::LoginRole::Admin) => println!("Admin"),
             Some(LoginAction::Granted(role)) => {
                 match role {
                     authentication::LoginRole::Admin => println!("Admin"),
