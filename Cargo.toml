@@ -7,5 +7,5 @@ edition = "2024"
 
 [workspace]
 members = [
-    "session1/hello_world",
+    "session1/hello_world", "session1/variables",
 ]
