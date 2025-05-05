@@ -39,12 +39,23 @@ impl User {
     }    
 }
 
-// Array (in memory static will not changed length once created) != Vector
-pub fn get_users() -> [User; 2] {
-    [
+// Array (in memory static will not changed length once created) != Vector (are stored in the heap so they are slightly slow to access but still fast and can change size)
+pub fn get_users() -> Vec<User> {
+    vec![
         User::new("admin", "password", LoginRole::Admin),
         User::new("bob", "password", LoginRole::User)
     ]
+
+    // let mut users = Vec::new();
+    // users.push(User::new(...))
+}
+
+fn get_admin_users() {
+    let users: Vec<String> = get_users()
+    .into_iter() // move the original data and the original vector will no longer be able to be used
+    .filter(|u| u.role == LoginRole::Admin)
+    .map(|u| u.username)
+    .collect(); // take w.e passed the filter e turn it to the type and need to be explicit
 }
 
 pub fn login(username: &str, password: &str) -> Option<LoginAction> {
