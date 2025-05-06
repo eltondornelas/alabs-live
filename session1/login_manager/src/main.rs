@@ -1,4 +1,4 @@
-use authentication::get_users;
+use authentication::{get_users, save_users, LoginRole, User};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -13,6 +13,29 @@ enum Commands {
     // built in documentation system
     /// List all users.
     List,
+    /// Add a user.
+    Add {
+        /// The user's login name
+        username: String,
+        /// The user's password (plaintext)
+        password: String,
+        /// Optional - mark as an admin
+        #[arg(long)]
+        admin: Option<bool>
+    }
+}
+
+fn add_user(username: String, password: String, admin: bool) {
+    let mut users = get_users();
+    let role = if admin {
+        LoginRole::Admin
+    } else {
+        LoginRole::User
+    };
+
+    let user = User::new(&username, &password, role);
+    users.insert(username, user);
+    save_users(users);
 }
 
 fn list_users() {
@@ -32,10 +55,17 @@ fn main() {
             list_users();
         }
 
+        Some(Commands::Add { username, password, admin }) => {
+            add_user(username, password, admin.unwrap_or(false));
+        }
+
         None => {
             println!("Run with --help to see instructions.")
             // cargo run -- --help
             // cargo run -- list
+            // cargo run -- add (--help)
+            // cargo run -- add fred password
+            // cargo run -- add --admin true fred2 password
         }
     }
 }
