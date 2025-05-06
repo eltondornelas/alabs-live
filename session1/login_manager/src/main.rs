@@ -22,6 +22,11 @@ enum Commands {
         /// Optional - mark as an admin
         #[arg(long)]
         admin: Option<bool>
+    },
+    /// Delete a user.
+    Delete {
+        /// User to delete
+        username: String
     }
 }
 
@@ -48,6 +53,16 @@ fn list_users() {
     });
 }
 
+fn delete_user(username: String) {
+    let mut users = get_users();
+    if users.contains_key(&username) {
+        users.remove(&username);
+        save_users(users);
+    } else {
+        println!("{username} does not exist!");
+    }
+}
+
 fn main() {
     let cli = Args::parse();
     match cli.command {
@@ -57,6 +72,10 @@ fn main() {
 
         Some(Commands::Add { username, password, admin }) => {
             add_user(username, password, admin.unwrap_or(false));
+        }
+
+        Some(Commands::Delete { username }) => {
+            delete_user(username);
         }
 
         None => {
