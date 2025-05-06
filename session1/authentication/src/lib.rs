@@ -1,4 +1,5 @@
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+use std::{collections::HashMap, path::Path};
 
 pub fn greet_user(name: &str) -> String {
     format!("Hello {name}")
@@ -19,13 +20,13 @@ pub enum LoginAction {
     Denied,
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Serialize, Deserialize)]
 pub enum LoginRole {
     Admin,
     User,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub username: String,
     pub password: String,
@@ -54,7 +55,7 @@ impl User {
 }
  */
 
-pub fn get_users() -> HashMap<String, User> {
+pub fn get_default_users() -> HashMap<String, User> {
     // hashmaps are slower than vectors for insertion but for search they are way faster
     let mut users = HashMap::new();
     users.insert(
@@ -67,6 +68,23 @@ pub fn get_users() -> HashMap<String, User> {
     );
     users
 }
+
+pub fn get_users() -> HashMap<String, User> {
+    let users_path = Path::new("users.json");
+    if users_path.exists() {
+        // Load the file!
+        let users_json = std::fs::read_to_string(users_path).unwrap();
+        let users: HashMap<String, User> = serde_json::from_str(&users_json).unwrap();
+        users
+    } else {
+        // Create a file and return it
+        let users = get_default_users();
+        let users_json = serde_json::to_string(&users).unwrap();
+        std::fs::write(users_path, users_json).unwrap();
+        users
+    }
+}
+
 /* // example for vecs interating
 fn get_admin_users() {
     let users: Vec<String> = get_users()
@@ -76,6 +94,7 @@ fn get_admin_users() {
     .collect(); // take w.e passed the filter e turn it to the type and need to be explicit
 }
  */
+
 pub fn login(username: &str, password: &str) -> Option<LoginAction> {
     let username = username.to_lowercase();
     let users = get_users();
@@ -124,3 +143,5 @@ mod tests {
 }
 
 // cargo new --lib authentication
+// cargo add serde -F derive
+// cargo add serde_json
