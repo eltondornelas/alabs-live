@@ -1,4 +1,4 @@
-use authentication::{get_users, save_users, LoginRole, User};
+use authentication::{LoginRole, User, get_users, save_users};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -21,13 +21,20 @@ enum Commands {
         password: String,
         /// Optional - mark as an admin
         #[arg(long)]
-        admin: Option<bool>
+        admin: Option<bool>,
     },
     /// Delete a user.
     Delete {
         /// User to delete
-        username: String
-    }
+        username: String,
+    },
+    /// Change a user's password
+    ChangePassword {
+        /// Username who's password should change
+        username: String,
+        /// New password
+        new_password: String,
+    },
 }
 
 fn add_user(username: String, password: String, admin: bool) {
@@ -63,6 +70,17 @@ fn delete_user(username: String) {
     }
 }
 
+fn change_password(username: String, password: String) {
+    let mut users = get_users();
+    if let Some(user) = users.get_mut(&username) {
+        // get_mut change in place, instead of putting it out change it then put it back
+        user.password = authentication::hash_password(&password);
+        save_users(users);
+    } else {
+        println!("{username} does not exist")
+    }
+}
+
 fn main() {
     let cli = Args::parse();
     match cli.command {
@@ -70,12 +88,23 @@ fn main() {
             list_users();
         }
 
-        Some(Commands::Add { username, password, admin }) => {
+        Some(Commands::Add {
+            username,
+            password,
+            admin,
+        }) => {
             add_user(username, password, admin.unwrap_or(false));
         }
 
         Some(Commands::Delete { username }) => {
             delete_user(username);
+        }
+
+        Some(Commands::ChangePassword {
+            username,
+            new_password,
+        }) => {
+            change_password(username, new_password);
         }
 
         None => {
@@ -85,6 +114,7 @@ fn main() {
             // cargo run -- add (--help)
             // cargo run -- add fred password
             // cargo run -- add --admin true fred2 password
+            // cargo run -- change-password --help
         }
     }
 }
