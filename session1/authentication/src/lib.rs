@@ -153,4 +153,5 @@ mod tests {
 // cargo new --lib authentication
 // cargo add serde -F derive
 // cargo add serde_json
-// cargo search sha2
+// cargo search sha2 (manually added)
+// cargo add clap -F derive (on login_manager crate)
