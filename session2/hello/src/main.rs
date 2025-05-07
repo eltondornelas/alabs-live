@@ -3,7 +3,7 @@ fn hello_thread(n: u32) {
 }
 
 fn do_math(i: u32) -> u32 {
-    let mut n = i+1;
+    let mut n = i + 1;
     for _ in 0..10 {
         n *= 2;
     }
@@ -25,16 +25,16 @@ fn main() {
     // thread_handles.into_iter().for_each(|h| h.join().unwrap());
     // this proves that it's not deterministic, the order that they will be running is determinated enterily by the Operating System
 
-    thread_handles.into_iter().for_each(|h| 
-        println!("{}", h.join().unwrap())
-    );
+    thread_handles
+        .into_iter()
+        .for_each(|h| println!("{}", h.join().unwrap()));
 
-/* 
-    let thread_handle = std::thread::spawn(hello_thread);
-    thread_handle.join().unwrap(); 
-    // when you join a thread you wait it to finish (join); if you don't it may detach right away with the main thread or it may take a little longer;
-    // if you comment the join command and run it you can see that sometimes it does not show the thread execution print
-    // when you start a thread you have no control how it will be schedule, the operating system will do for you
-    // threads must be threated as a independent program, the data comes in do something then comes out
- */
+    /*
+       let thread_handle = std::thread::spawn(hello_thread);
+       thread_handle.join().unwrap();
+       // when you join a thread you wait it to finish (join); if you don't it may detach right away with the main thread or it may take a little longer;
+       // if you comment the join command and run it you can see that sometimes it does not show the thread execution print
+       // when you start a thread you have no control how it will be schedule, the operating system will do for you
+       // threads must be threated as a independent program, the data comes in do something then comes out
+    */
 }
