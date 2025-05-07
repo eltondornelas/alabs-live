@@ -11,7 +11,7 @@ fn main() {
         for chunk in chunks {
             // spawning into a scope and not globably like last examples
             // rust knows that scope must end and for that you don't need to use .to_owned(), can use as reference
-            let thread_handle = s.spawn(move || chunk.iter().sum::<u32>());
+            let thread_handle = s.spawn(move || chunk.iter().sum::<u32>()); // could remove "move" since dont need to be owned
 
             thread_handles.push(thread_handle);
             //the scope will join when all of the threads complete
