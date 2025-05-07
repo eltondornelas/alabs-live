@@ -1,0 +1,14 @@
+# Which of the following is a primary reason to use Rustup.rs instead of a package manager?
+Rustup.rs provides the flexibility to pin to a specific version of Rust, which is important for ensuring repeatable builds in projects. Package managers may not offer this level of control, and often lack the most recent versions.
+
+# What is the primary difference between vectors and arrays in Rust?
+Vectors are similar to arrays but can grow or shrink in size, making them more flexible. Arrays, on the other hand, have a fixed size that is set at compile time. Vectors are stored on the heap rather than the stack.
+
+# When would using a HashMap be more beneficial than a Vector?
+HashMaps are designed for fast lookups based on a key. While inserting into a HashMap can be slower than inserting into a Vector, searching is significantly faster, especially with large datasets. Vectors are better suited for storing and accessing bulk amounts of data when the order is important or when iterating through all the elements, but not as efficient when searching for a specific entry.
+
+# What is the purpose of the derive feature in the context of the serde crate?
+The derive feature of the serde crate automatically generates code to serialize and deserialize data structures. This greatly simplifies the process of converting data between Rust types and formats like JSON.
+
+# What does the cargo check -- -A clippy command do?
+Running cargo check with the additional -A clippy option enables the linter to check the code for style and potential issues, and offers suggestions based on idiomatic Rust practices. While cargo check checks for errors, clippy provides additional code style and best practices analysis.
