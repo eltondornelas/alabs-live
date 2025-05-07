@@ -2,20 +2,32 @@ fn hello_thread(n: u32) {
     println!("Hello from thread {n}");
 }
 
+fn do_math(i: u32) -> u32 {
+    let mut n = i+1;
+    for _ in 0..10 {
+        n *= 2;
+    }
+    n
+}
 
 fn main() {
     println!("Hello with from the main thread");
 
     let mut thread_handles = Vec::new();
-    for i in 0..5 {
-        let thread_handle = std::thread::spawn(move || hello_thread(i)); // move => decorator
+    for i in 0..10 {
+        // let thread_handle = std::thread::spawn(move || hello_thread(i)); // move => decorator
+        let thread_handle = std::thread::spawn(move || do_math(i));
         // the thread tends to own the data that goes in, thats why you need to move it, once the scopes only exists inside de loop
         thread_handles.push(thread_handle);
     }
 
     // when main thread ends you have to wait the other threads to end or it will end right away too
-    thread_handles.into_iter().for_each(|h| h.join().unwrap());
+    // thread_handles.into_iter().for_each(|h| h.join().unwrap());
     // this proves that it's not deterministic, the order that they will be running is determinated enterily by the Operating System
+
+    thread_handles.into_iter().for_each(|h| 
+        println!("{}", h.join().unwrap())
+    );
 
 /* 
     let thread_handle = std::thread::spawn(hello_thread);
