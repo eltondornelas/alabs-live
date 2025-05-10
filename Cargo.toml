@@ -12,6 +12,7 @@ members = [
     "session1/login", 
     "session1/login_manager",
     "session1/variables", 
+    "session2/deadlocks", 
     "session2/divide_work", 
     "session2/footgun", 
     "session2/hello", 
