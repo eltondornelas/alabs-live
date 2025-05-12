@@ -23,5 +23,6 @@ members = [
     "session2/rwlocks", 
     "session2/scope_threads", 
     "session2/thread_builder", 
-    "session2/workers",
+    "session2/workers", 
+    "session2/workers2",
 ]
