@@ -23,6 +23,7 @@ members = [
     "session2/parking", 
     "session2/priority", 
     "session2/rayon_iters", 
+    "session2/rayon_scopes", 
     "session2/rwlocks", 
     "session2/scope_threads", 
     "session2/thread_builder", 

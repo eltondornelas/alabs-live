@@ -435,6 +435,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "rayon_scopes"
+version = "0.1.0"
+dependencies = [
+ "rayon",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.5.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
