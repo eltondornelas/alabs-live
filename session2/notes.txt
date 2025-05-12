@@ -1,0 +1,19 @@
+# Which of the following is a key characteristic of system threads?
+They have their own stack and can execute independently. 
+System threads live within their parent process and share memory, but each has its own stack allowing for independent execution. They are not ideal for network operations involving thousands of threads, and they are an operating system level construct.
+
+# What is the primary advantage of using a read/write lock over a mutex in certain scenarios?
+It provides exclusive access to data for all operations.
+Read/write locks allow multiple readers to access data simultaneously, without contention, while write locks are exclusive and act like a mutex, waiting for all readers to finish. This makes them more efficient than mutexes when reads are frequent and writes are occasional.
+
+# What is the purpose of the try_lock method on a mutex or read/write lock?
+It allows a thread to attempt to acquire a lock without blocking.
+The try_lock method allows a thread to attempt to acquire a lock, and if the lock is not immediately available, the thread can proceed without waiting. This is useful to avoid deadlocks or if there is alternative work a thread can do.
+
+# How does Rayon simplify parallel programming in Rust?
+It automates thread pool creation and provides parallel iterators.
+Rayon simplifies parallel programming by automating thread pool management and providing parallel iterators (par_iter) that automatically divide work across multiple threads. It is not limited to simple operations and works well with iterators to make parallelizing code easier.
+
+# When using channels in Rust, how is data typically sent and received between threads?
+Data is moved from a transmitter to a receiver.
+In Rust, channels involve a transmitter (sender) that sends data into the channel, and a receiver that receives data from it. Rust channels use drop semantics and do not need to be explicitly closed. Only the transmitter can be cloned, and there can only be one receiver per channel.
