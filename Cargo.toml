@@ -28,5 +28,6 @@ members = [
     "session2/scope_threads", 
     "session2/thread_builder", 
     "session2/workers", 
-    "session2/workers2",
+    "session2/workers2", 
+    "session3/hello_async",
 ]
