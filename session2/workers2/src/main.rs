@@ -6,7 +6,7 @@ static WORK_QUEUE: Lazy<Mutex<VecDeque<String>>> = Lazy::new(|| Mutex::new(VecDe
 
 fn main() {
     // Commented out for clarity: a real work pool will use this
-    //let cpu_count = num_cpus::get();
+    //let cpu_count = num_cpus::get(); // get the num of cpu_threads
     let cpu_count = 2;
     let mut threads = Vec::with_capacity(cpu_count); // with_capacity allocates memory right away avoiding reallocation speeding things out
     let mut broadcast = Vec::with_capacity(cpu_count); // multi producers and single consumer
