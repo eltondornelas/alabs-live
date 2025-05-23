@@ -30,6 +30,7 @@ members = [
     "session2/workers", 
     "session2/workers2", 
     "session3/blocking", 
+    "session3/errors", 
     "session3/hello_async", 
     "session3/hello_tokio", 
     "session3/hello_tokio2", 
