@@ -33,8 +33,8 @@ type GenericResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 fn load_users() -> Result<Vec<User>, UsersError> {
     let my_path = Path::new("users.json");
     // let raw_text = std::fs::read_to_string(my_path)?;
-    let raw_text = std::fs::read_to_string(my_path).map_err(|_| UsersError::NoUsers)?;
-    let users: Vec<User> = serde_json::from_str(&raw_text).map_err(|_| UsersError::NoUsers)?;
+    let raw_text = std::fs::read_to_string(my_path).map_err(|_| UsersError::NoUsers)?; // question mark (?) = just give me the result and leave if it is failing
+    let users: Vec<User> = serde_json::from_str(&raw_text).map_err(|_| UsersError::NoUsers)?; // avoiding Box errors
     // anyhow::bail!("oh no! We can't go on!");
     Ok(users)
 }
