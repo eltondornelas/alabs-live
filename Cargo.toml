@@ -3,8 +3,6 @@ name = "alab-live"
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
-
 [workspace]
 members = [ 
     "session1/authentication",
@@ -36,5 +34,6 @@ members = [
     "session3/hello_tokio", 
     "session3/hello_tokio2", 
     "session3/rest_client", 
+    "session3/tcp_server", 
     "session3/tokio_testing",
 ]
