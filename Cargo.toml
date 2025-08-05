@@ -26,7 +26,8 @@ members = [
     "session2/scope_threads", 
     "session2/thread_builder", 
     "session2/workers", 
-    "session2/workers2", "session3/async_mutex", 
+    "session2/workers2", 
+    "session3/async_mutex", 
     "session3/blocking", 
     "session3/channels", 
     "session3/errors", 
@@ -36,5 +37,7 @@ members = [
     "session3/hello_tokio2", 
     "session3/rest_client", 
     "session3/tcp_server", 
+    "session3/tokio_select", 
+    "session3/tokio_select2", 
     "session3/tokio_testing",
 ]
