@@ -34,7 +34,7 @@ members = [
     "session3/fileio", 
     "session3/hello_async", 
     "session3/hello_tokio", 
-    "session3/hello_tokio2", 
+    "session3/hello_tokio2", "session3/recursion", 
     "session3/rest_client", 
     "session3/tcp_server", 
     "session3/tokio_select", 
