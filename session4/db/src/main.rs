@@ -7,6 +7,17 @@ struct Message {
     message: String,
 }
 
+// ? = placeholder
+async fn update_message(id: i64, message: &str, pool: &sqlx::SqlitePool) -> anyhow::Result<()> {
+    sqlx::query("UPDATE messages SET message = ? Where id = ?")
+        .bind(message) // same order of the questions markers
+        .bind(id)
+        .execute(pool)
+        .await?;
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv()?;
@@ -22,8 +33,9 @@ async fn main() -> anyhow::Result<()> {
         .await?; // the iterator grabs the whole thing making pausing things
 
     // for working with data like objects (strong type), Diesel should be more effective than sqlx
-
     println!("{messages:?}");
+
+    update_message(4, "Updated Message", &pool).await?;
 
     let mut message_stream =
         sqlx::query_as::<_, Message>("SELECT id, message FROM messages").fetch(&pool);
