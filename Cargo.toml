@@ -41,5 +41,6 @@ members = [
     "session3/tokio_select", 
     "session3/tokio_select2", 
     "session3/tokio_testing", 
+    "session4/db", 
     "session4/logspan",
 ]
