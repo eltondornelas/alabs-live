@@ -2,7 +2,20 @@ use anyhow::Ok;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    println!("Hello, world!");
+    // Read the .env file and obtain the database URL
+    // Read the .env file and build environment variables
+    dotenv::dotenv()?; // is not async but  potentially throws errors so needs the question mark
+    let db_url = std::env::var("DATABASE_URL")?;
+
+    // Get a database connection pool
+    let pool = sqlx::SqlitePool::connect(&db_url).await?; // sqlx is always assync
+
+    // Run Migrations
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await?;
+
+
     Ok(())
 }
 
