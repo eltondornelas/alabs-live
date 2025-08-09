@@ -1,8 +1,16 @@
 use anyhow::Ok;
-use axum::{extract::{Multipart, Path}, http::{header, HeaderMap}, response::{Html, IntoResponse}, routing::{get, post}, Extension, Router};
-use sqlx::{pool, Row};
-use tokio_util::io::ReaderStream;
 use axum::body::Body;
+use axum::{
+    Extension, Router,
+    extract::{Multipart, Path},
+    http::{HeaderMap, header},
+    response::{Html, IntoResponse},
+    routing::{get, post},
+};
+use futures::TryStreamExt;
+use sqlx::{Pool, Row, Sqlite};
+use tokio::task::spawn_blocking;
+use tokio_util::io::ReaderStream;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -15,9 +23,10 @@ async fn main() -> anyhow::Result<()> {
     let pool = sqlx::SqlitePool::connect(&db_url).await?; // sqlx is always assync
 
     // Run Migrations
-    sqlx::migrate!("./migrations")
-        .run(&pool)
-        .await?;
+    sqlx::migrate!("./migrations").run(&pool).await?;
+
+    // Check thumbnails
+    fill_missing_thumbnails(&pool).await?;
 
     // Build Axum with an "extension" to hold the database connection pool
     let app = Router::new()
@@ -43,7 +52,7 @@ async fn index_page() -> Html<String> {
     Html(content)
 }
 
-async fn insert_image_into_database(pool: &sqlx::SqlitePool, tags: &str) -> anyhow::Result<i64>  {
+async fn insert_image_into_database(pool: &sqlx::SqlitePool, tags: &str) -> anyhow::Result<i64> {
     let row = sqlx::query("INSERT INTO images (tags) VALUES (?) RETURNING id")
         .bind(tags)
         .fetch_one(pool)
@@ -79,11 +88,11 @@ async fn uploader(
 ) -> String {
     let mut tags = None; // "None" means "no tags yet"
     let mut image = None;
-    
+
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap().to_string();
         let data = field.bytes().await.unwrap();
-        
+
         // println!("name: {name}, data: {}", data.len());
 
         match name.as_str() {
@@ -93,10 +102,12 @@ async fn uploader(
         }
     }
 
-    if let (Some(tags), Some(image)) = (tags, image) { // Destructuring both Options at once
+    if let (Some(tags), Some(image)) = (tags, image) {
+        // Destructuring both Options at once
         // println!("{tags} is {} bytes", image.len());
         let new_image_id = insert_image_into_database(&pool, &tags).await.unwrap();
-        save_image(new_image_id, &image).await.unwrap();  // just by addind the & turns the vector into a slice to borrow it
+        save_image(new_image_id, &image).await.unwrap(); // just by addind the & turns the vector into a slice to borrow it
+        spawn_blocking(move || make_thumbnail(new_image_id).unwrap());
     } else {
         panic!("Missing field");
     }
@@ -116,15 +127,53 @@ async fn get_image(Path(id): Path<i64>) -> impl IntoResponse {
 
     headers.insert(
         header::CONTENT_DISPOSITION,
-        header::HeaderValue::from_str(&attachment).unwrap()
+        header::HeaderValue::from_str(&attachment).unwrap(),
     );
 
     let file = tokio::fs::File::open(&filename).await.unwrap();
     axum::response::Response::builder()
-        .header(header::CONTENT_TYPE, header::HeaderValue::from_static("image/jpeg"))
-        .header(header::CONTENT_DISPOSITION, header::HeaderValue::from_str(&attachment).unwrap())
+        .header(
+            header::CONTENT_TYPE,
+            header::HeaderValue::from_static("image/jpeg"),
+        )
+        .header(
+            header::CONTENT_DISPOSITION,
+            header::HeaderValue::from_str(&attachment).unwrap(),
+        )
         .body(Body::from_stream(ReaderStream::new(file)))
         .unwrap()
+}
+
+fn make_thumbnail(id: i64) -> anyhow::Result<()> {
+    // synchronous code
+    let image_path = format!("images/{id}.jpg");
+    let thumbnail_path = format!("images/{id}_thumb.jpg");
+    let image_bytes: Vec<u8> = std::fs::read(image_path)?;
+
+    let image = if let std::result::Result::Ok(format) = image::guess_format(&image_bytes) {
+        image::load_from_memory_with_format(&image_bytes, format)?
+    } else {
+        image::load_from_memory(&image_bytes)?
+    };
+
+    let thumbnail = image.thumbnail(100, 100);
+    thumbnail.save(thumbnail_path)?;
+
+    Ok(())
+}
+
+async fn fill_missing_thumbnails(pool: &Pool<Sqlite>) -> anyhow::Result<()> {
+    let mut rows = sqlx::query("SELECT id FROM images").fetch(pool);
+
+    while let Some(row) = rows.try_next().await? {
+        let id = row.get::<i64, _>(0);
+        let thumbnail_path = format!("images/{id}_thumb.jpg");
+        if !std::path::Path::new(&thumbnail_path).exists() {
+            spawn_blocking(move || make_thumbnail(id)).await??;
+        }
+    }
+
+    Ok(())
 }
 
 // async fn uploader(mut multipart: Multipart) -> String {
@@ -137,17 +186,15 @@ async fn get_image(Path(id): Path<i64>) -> impl IntoResponse {
 //     "Ok".to_string()
 // }
 
-
 /* async fn test_database(Extension(pool): Extension<sqlx::SqlitePool>) -> String {
     let result = sqlx::query("SELECT COUNT(id) FROM images")
         .fetch_one(&pool)
         .await
         .unwrap();
-    
+
     let count = result.get::<i64, _>(0);
     format!("{count} images in the database")
 } */
-
 
 // cargo add tokio -F full
 // cargo add serde -F derive
