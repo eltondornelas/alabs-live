@@ -1,0 +1,19 @@
+# Which of the following is NOT a characteristic of system threads?
+Cooperatively multitasked.
+System threads are managed by the operating system and are preemptively multitasked. They can be used to schedule work, send work between queues, and manage CPU usage. Cooperative multitasking is a feature of async tasks, not system threads.
+
+# What does the select function do in the context of asynchronous tasks?
+It runs multiple requests concurrently and returns the result of the first to complete.
+The select function runs multiple requests concurrently. As soon as one of the tasks completes, select takes its answer, cancels the other requests, and proceeds with the received result. It does not wait for all tasks to complete, run them sequentially, or cancel all tasks. It cancels the uncompleted tasks after one returns.
+
+# What is the purpose of "pinning" in asynchronous Rust?
+To make code run faster. OBS: the response does not make sense for the right answer, should be: To ensure that the location of a future in memory doesn't change.
+Pinning is used to ensure that the memory location of a future does not change, especially when dealing with dynamic scenarios. It is often necessary when working with select or streams. It does not directly make code run faster, simplify error handling, or enable synchronous code to run directly in an asynchronous context. Box::pin is used to create a pinned future.
+
+# According to the sources, what is SQLX primarily used for?
+Directly mapping results of SQL queries into types.
+SQLX is used for mapping the results of SQL queries directly into types. It is not a full object-relational mapper. While SQLX can be used alongside web services, it is not primarily a web service system and it does not manage system threads. SQLX allows for queries to be mapped into a struct using the from_row feature.
+
+# What is the primary benefit of using asynchronous file I/O over synchronous file I/O, according to the sources?
+it allows for smoother access to large datasets and better responsiveness.
+Asynchronous file I/O allows for smoother access to large datasets and maintains responsiveness in a program by yielding control to other tasks, preventing a single file read from blocking the whole system. While async I/O can improve throughput, it may not always be faster for individual file access, and while it can help manage memory by streaming data, it does not inherently reduce memory usage. Synchronous file access can cause stuttering if not handled properly.
