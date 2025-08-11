@@ -45,6 +45,8 @@ members = [
     "session4/logspan", 
     "session4/thumbs", 
     "session4/web_service", 
-    "session5/dropping", "session5/dropping_raii", 
-    "session5/memory",
+    "session5/dropping", 
+    "session5/dropping_raii", 
+    "session5/memory", 
+    "session5/refc",
 ]
