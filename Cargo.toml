@@ -49,5 +49,6 @@ members = [
     "session5/dropping_raii", 
     "session5/lifetimes", 
     "session5/memory", 
-    "session5/refc",
+    "session5/refc", 
+    "session5/traits",
 ]
