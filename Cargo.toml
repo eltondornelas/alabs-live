@@ -48,6 +48,7 @@ members = [
     "session5/dropping", 
     "session5/dropping_raii", 
     "session5/generics", 
+    "session5/iterators", 
     "session5/lifetimes", 
     "session5/memory", 
     "session5/refc", 
