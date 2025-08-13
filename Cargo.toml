@@ -47,6 +47,7 @@ members = [
     "session4/web_service", 
     "session5/dropping", 
     "session5/dropping_raii", 
+    "session5/generics", 
     "session5/lifetimes", 
     "session5/memory", 
     "session5/refc", 
