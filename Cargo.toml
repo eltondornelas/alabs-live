@@ -52,6 +52,7 @@ members = [
     "session5/iterators", 
     "session5/lifetimes", 
     "session5/memory", 
+    "session5/packing", 
     "session5/refc", 
     "session5/traits",
 ]
