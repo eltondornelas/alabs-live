@@ -809,6 +809,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "ffi"
+version = "0.1.0"
+
+[[package]]
 name = "fileio"
 version = "0.1.0"
 dependencies = [
@@ -1681,6 +1685,10 @@ version = "0.1.0"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "memory_fragmentation"
+version = "0.1.0"
 
 [[package]]
 name = "mime"

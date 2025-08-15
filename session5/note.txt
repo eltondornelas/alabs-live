@@ -1,0 +1,13 @@
+# Which of the following is NOT a reason to use the unsafe keyword in Rust?
+To directly manage memory allocation and deallocation.
+While the unsafe keyword allows for low-level memory manipulation, it's not the primary reason to use it. The sources indicate that unsafe is used when Rust's safety checks cannot be guaranteed, such as when interacting with external code or performing manual optimizations. Rust generally handles memory allocation automatically, so direct management is not the main use case for unsafe.
+
+# What is a bump-style arena allocator primarily used for?
+Allocating a large chunk of memory upfront and then managing it internally without deallocation
+It is explained that a bump-style arena allocates a large block of memory at once, and then subsequent allocations are made within that block. These allocations cannot be deallocated individually. This method is useful when memory usage is predictable and when the performance overhead of deallocation needs to be avoided.
+
+# What does the term "name mangling" refer to in the context of Rust? 
+The transformation of function and type names into a form that is used in the compiled binary
+Name mangling is the process where the Rust compiler changes the names of functions and types before storing them in the compiled binary. This is usually done to avoid naming conflicts, especially in the presence of generics and traits. You can disable name mangling when interacting with other languages.
+
+
