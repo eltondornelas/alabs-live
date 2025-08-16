@@ -58,5 +58,6 @@ members = [
     "session5/packing", 
     "session5/refc", 
     "session5/traits", 
+    "session6/collector", 
     "session6/shared_data",
 ]

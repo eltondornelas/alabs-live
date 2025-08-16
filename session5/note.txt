@@ -10,4 +10,10 @@ It is explained that a bump-style arena allocates a large block of memory at onc
 The transformation of function and type names into a form that is used in the compiled binary
 Name mangling is the process where the Rust compiler changes the names of functions and types before storing them in the compiled binary. This is usually done to avoid naming conflicts, especially in the presence of generics and traits. You can disable name mangling when interacting with other languages.
 
+# Which of the following is NOT a characteristic of the Drop trait in Rust?
+It requires explicit calls to deallocate memory with the operating system
+The Drop trait is used to define cleanup actions that should happen when a value is no longer in use, such as releasing resources. It does not require developers to explicitly call the operating system to deallocate memory. Instead, Drop is automatically invoked when the value goes out of scope, freeing allocated memory and closing open resources.
 
+# What is the primary difference between Rc and Arc in Rust?
+Rc is used for single-threaded scenarios, while Arc is used for multi-threaded scenarios
+Rc (Reference Counted) is not thread-safe and is meant for single-threaded use, while Arc (Atomic Reference Counted) uses atomic operations, making it safe to share across multiple threads. Arc is slightly slower than Rc due to the overhead of atomic operations, but it is necessary for concurrent programming.
