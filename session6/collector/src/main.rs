@@ -1,7 +1,16 @@
-use shared_data::{CollectorCommandV1, DATA_COLLECTOR_ADDRESS};
-use std::{time::Instant, sync::mpsc::Sender};
+use shared_data::{encode_v1, CollectorCommandV1, DATA_COLLECTOR_ADDRESS};
+use std::collections::VecDeque;
 use std::io::Write;
+use std::{sync::mpsc::Sender, time::Instant};
+use thiserror::Error;
 
+#[derive(Debug, Error)]
+pub enum CollectorError {
+    #[error("Unable to connect to the server")]
+    UnableToConnect,
+    #[error("Sending the data failed")]
+    UnableToSend,
+}
 
 pub fn collect_data(tx: Sender<CollectorCommandV1>) {
     // Initialize the sysinfo system
@@ -52,12 +61,49 @@ pub fn collect_data(tx: Sender<CollectorCommandV1>) {
     }
 }
 
+// pub fn send_command(command: &CollectorCommandV1) -> Result<(), CollectorError> {
+//     let bytes = shared_data::encode_v1(&command);
+//     println!("Encoded {} bytes", bytes.len());
 
-pub fn send_command(command: CollectorCommandV1) {
-    let bytes = shared_data::encode_v1(command);
+//     let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS)
+//         .map_err(|_| CollectorError::UnableToConnect)?;
+
+//     stream
+//         .write_all(&bytes)
+//         .map_err(|_| CollectorError::UnableToSend)?;
+
+//     Ok(())
+// }
+
+pub fn send_command(bytes: &[u8]) -> Result<(), CollectorError> {
     println!("Encoded {} bytes", bytes.len());
-    let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS).unwrap();
-    stream.write_all(&bytes).unwrap();
+    
+    let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS)
+        .map_err(|_| CollectorError::UnableToConnect)?;
+    
+    stream
+        .write_all(bytes)
+        .map_err(|_| CollectorError::UnableToSend)?;
+
+    Ok(())
+}
+
+pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
+    println!("Queue {} bytes", queue.len());
+
+    // Connect
+    let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS)
+        .map_err(|_| CollectorError::UnableToConnect)?;
+
+    // Send every queue item
+    while let Some(command) = queue.pop_front() {
+        if stream.write_all(&command).is_err() {
+            queue.push_front(command);
+            return Err(CollectorError::UnableToSend);
+        }
+    }
+
+    Ok(())
 }
 
 fn main() {
@@ -69,10 +115,27 @@ fn main() {
     });
 
     // Listen for commands to send
+    let mut data_queue = VecDeque::with_capacity(120); // 1 per second gives 2 min to drop
     while let Ok(command) = rx.recv() {
-        send_command(command);
+        let encoded = encode_v1(&command);
+        data_queue.push_back(encoded);
+        let _ = send_queue(&mut data_queue);
+        
+        // Send all the queued commands
+        /* while let Some(command) = data_queue.pop_front() {
+            if send_command(&command).is_err() {
+                println!("Error sending command");
+
+                data_queue.push_front(command);
+                break;
+            }
+        } */
+        // let _ = send_command(command);
     }
 }
 
 // send the data from the data collector and receive in the ingester
 // cargo add sysinfo -F apple-app-store
+
+// the client crashes in the moment the server goes away, can never assume that server will be there
+// cargo add thiserror

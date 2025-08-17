@@ -24,7 +24,7 @@ pub enum CollectorCommandV1 {
     },
 }
 
-pub fn encode_v1(command: CollectorCommandV1) -> Vec<u8> {
+pub fn encode_v1(command: &CollectorCommandV1) -> Vec<u8> {
     let json = serde_json::to_string(&command).unwrap();
     let json_bytes = json.as_bytes();
     let crc = crc32fast::hash(json_bytes);
@@ -82,7 +82,7 @@ mod tests {
             average_cpu_usage: 0.5,
         };
 
-        let encoded = encode_v1(command.clone());
+        let encoded = encode_v1(&command);
         println!("{:?}", encoded);
         let (timestamp, decoded) = decode_v1(&encoded);
         
