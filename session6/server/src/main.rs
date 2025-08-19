@@ -135,4 +135,4 @@ pub async fn collector_data(
 // cargo add axum
 // cargo add futures
 // cargo add serde -F derive
-// cargo add tower-http -F cors 
+// cargo add tower-http -F cors

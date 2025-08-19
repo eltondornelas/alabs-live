@@ -102,7 +102,7 @@ pub fn send_command(bytes: &[u8]) -> Result<(), CollectorError> {
 }
 
 pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
-    println!("Queue {} bytes", queue.len());
+    // println!("Queue {} bytes", queue.len());
 
     // Connect
     let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS)
@@ -132,6 +132,7 @@ fn main() {
     let mut data_queue = VecDeque::with_capacity(120); // 1 per second gives 2 min to drop
     while let Ok(command) = rx.recv() {
         let encoded = encode_v1(&command);
+        println!("Encoded size: {} bytes", encoded.len()); // with bincode could reduce more than 50% of the bytes (130 -> 56)
         data_queue.push_back(encoded);
         let _ = send_queue(&mut data_queue);
 

@@ -1,3 +1,4 @@
+use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -14,7 +15,7 @@ fn unix_now() -> u32 {
     since_the_epoch.as_secs() as u32
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Encode, Decode)]
 pub enum CollectorCommandV1 {
     SubmitData {
         collector_id: u128, // To be converted from a UUID
@@ -25,10 +26,13 @@ pub enum CollectorCommandV1 {
 }
 
 pub fn encode_v1(command: &CollectorCommandV1) -> Vec<u8> {
-    let json = serde_json::to_string(&command).unwrap();
-    let json_bytes = json.as_bytes();
-    let crc = crc32fast::hash(json_bytes);
-    let payload_size = json_bytes.len() as u32;
+    // let json = serde_json::to_string(&command).unwrap();
+    // let json_bytes = json.as_bytes();
+    // let crc = crc32fast::hash(&json_bytes);
+    // let payload_size = json_bytes.len() as u32;
+    let payload_bytes = bincode::encode_to_vec(command, bincode::config::standard()).unwrap();
+    let crc = crc32fast::hash(&payload_bytes);
+    let payload_size = payload_bytes.len() as u32;
     let timestamp = unix_now();
 
     // Encode into bytes
@@ -37,7 +41,8 @@ pub fn encode_v1(command: &CollectorCommandV1) -> Vec<u8> {
     result.extend_from_slice(&VERSION_NUMBER.to_be_bytes());
     result.extend_from_slice(&timestamp.to_be_bytes());
     result.extend_from_slice(&payload_size.to_be_bytes());
-    result.extend_from_slice(json_bytes);
+    // result.extend_from_slice(json_bytes);
+    result.extend_from_slice(&payload_bytes);
     result.extend_from_slice(&crc.to_be_bytes());
     result
 }
@@ -66,7 +71,8 @@ pub fn decode_v1(bytes: &[u8]) -> (u32, CollectorCommandV1) {
     assert_eq!(crc, computed_crc);
 
     // Decode the payload
-    (timestamp, serde_json::from_slice(payload).unwrap())
+    (timestamp, bincode::decode_from_slice(payload, bincode::config::standard()).unwrap().0)
+    // (timestamp, serde_json::from_slice(payload).unwrap())
 }
 
 #[cfg(test)]
@@ -96,3 +102,4 @@ mod tests {
 
 // cargo add crc32fast
 // cargo test -- --nocapture
+// cargo add bincode -F i128
