@@ -1,0 +1,19 @@
+# Which of the following is the primary purpose of the magic number in the data transmission protocol?
+To verify that the client is speaking in an acceptable way, that is, the correct format
+The magic number is a sequence of bytes sent at the beginning of a transmission to quickly determine if the data is in the expected format. If the magic number does not match what the server expects, the connection can be dropped. It is not for encryption, versioning, or providing a checksum, though these are all components of the protocol.
+
+# In the data collector, what is the purpose of the MPSC channel?
+To pass data between the data collection thread and the sending thread
+The MPSC (multiple producer, single consumer) channel is used to send data from the thread that collects the system's metrics to the thread that sends the data over the network. This allows data collection and transmission to operate concurrently. The channel also allows messages to queue up if sending is slower than receiving.
+
+# Why does the data collector queue data when the server is unavailable?
+To ensure data is sent when the server becomes available, thus preventing data loss
+When the server is unavailable, the data collector queues data so that it is not lost and can be sent when the server is back online. The queue provides a buffer that can hold data up to a certain limit. The collector is designed not to crash when the server is unavailable. The data is encoded only once before being added to the queue.
+
+# Which crate is used to provide unique IDs for each data collector?
+UUID
+The UUID crate is specifically used to generate unique identifiers for each data collector, ensuring that data can be correctly attributed to its source. The sysinfo crate is for gathering system data, SQLx is for database interaction, and Axum is a web framework.
+
+# What is the primary benefit of switching from JSON to bin code for data serialization?
+It significantly reduces the amount of data transmitted, thus saving bandwidth
+Bin code is a binary serialization format that is more compact than JSON, resulting in a large reduction in the amount of data transmitted. It does not inherently improve security, readability, or simplify the code, although the code does change to accommodate the format.
