@@ -2633,6 +2633,7 @@ dependencies = [
  "shared_data",
  "sqlx",
  "tokio",
+ "tower-http",
  "uuid",
 ]
 

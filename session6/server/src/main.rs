@@ -1,6 +1,14 @@
 mod collector;
 
-use axum::{Extension, Json, Router, extract::Path, routing::get};
+use axum::{
+    Extension, Json, Router,
+    extract::Path,
+    http::{self, Method},
+    response::Html,
+    routing::get,
+};
+use http::header::CONTENT_TYPE;
+use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -13,10 +21,20 @@ async fn main() -> anyhow::Result<()> {
 
     // Launch Axum here
     // Start the web server
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods([Method::GET, Method::POST])
+        .allow_headers([CONTENT_TYPE]);
+    // .allow_methods(Any)
+    // .allow_headers(Any);
+
     let app = Router::new()
+        .route("/", get(index))
+        .route("/collector.html", get(collector))
         .route("/api/all", get(show_all))
         .route("/api/collectors", get(show_collectors))
         .route("/api/collector/{uuid}", get(collector_data))
+        .layer(cors)
         .layer(Extension(pool));
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
@@ -31,6 +49,18 @@ async fn main() -> anyhow::Result<()> {
     handle.await??; // Two question marks - we're unwrapping the task result, and the result from running the collector.
 
     Ok(())
+}
+
+async fn index() -> Html<String> {
+    let path = std::path::Path::new("src/index.html");
+    let content = tokio::fs::read_to_string(path).await.unwrap();
+    Html(content)
+}
+
+async fn collector() -> Html<String> {
+    let path = std::path::Path::new("src/collector.html");
+    let content = tokio::fs::read_to_string(path).await.unwrap();
+    Html(content)
 }
 
 use sqlx::FromRow;
@@ -105,3 +135,4 @@ pub async fn collector_data(
 // cargo add axum
 // cargo add futures
 // cargo add serde -F derive
+// cargo add tower-http -F cors 
