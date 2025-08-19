@@ -1,10 +1,11 @@
-use shared_data::{encode_v1, CollectorCommandV1, DATA_COLLECTOR_ADDRESS};
+use shared_data::{CollectorCommandV1, DATA_COLLECTOR_ADDRESS, encode_v1};
 use std::collections::VecDeque;
 use std::io::Write;
 use std::{sync::mpsc::Sender, time::Instant};
 use thiserror::Error;
 
-fn get_uuid() -> u128 { // offered by documentation
+fn get_uuid() -> u128 {
+    // offered by documentation
     let path = std::path::Path::new("uuid");
     if path.exists() {
         let contents = std::fs::read_to_string(path).unwrap();
@@ -89,10 +90,10 @@ pub fn collect_data(tx: Sender<CollectorCommandV1>, collector_id: u128) {
 
 pub fn send_command(bytes: &[u8]) -> Result<(), CollectorError> {
     println!("Encoded {} bytes", bytes.len());
-    
+
     let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS)
         .map_err(|_| CollectorError::UnableToConnect)?;
-    
+
     stream
         .write_all(bytes)
         .map_err(|_| CollectorError::UnableToSend)?;
@@ -119,7 +120,7 @@ pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
 }
 
 fn main() {
-    let uuid = get_uuid();    
+    let uuid = get_uuid();
     let (tx, rx) = std::sync::mpsc::channel::<CollectorCommandV1>();
 
     // Start the collector thread
@@ -133,7 +134,7 @@ fn main() {
         let encoded = encode_v1(&command);
         data_queue.push_back(encoded);
         let _ = send_queue(&mut data_queue);
-        
+
         // Send all the queued commands
         /* while let Some(command) = data_queue.pop_front() {
             if send_command(&command).is_err() {

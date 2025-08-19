@@ -1,6 +1,6 @@
 mod collector;
 
-use axum::{extract::Path, routing::get, Extension, Json, Router};
+use axum::{Extension, Json, Router, extract::Path, routing::get};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -18,11 +18,11 @@ async fn main() -> anyhow::Result<()> {
         .route("/api/collectors", get(show_collectors))
         .route("/api/collector/{uuid}", get(collector_data))
         .layer(Extension(pool));
-    
+
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
         .unwrap();
-    
+
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
@@ -53,7 +53,7 @@ pub async fn show_all(Extension(pool): Extension<sqlx::SqlitePool>) -> Json<Vec<
         .fetch_all(&pool)
         .await
         .unwrap();
-    
+
     Json(rows)
 
     // while let Some(row) = rows.try_next().await.unwrap() {
@@ -74,18 +74,25 @@ pub async fn show_collectors(Extension(pool): Extension<sqlx::SqlitePool>) -> Js
     collector_id, 
     (SELECT MAX(received) FROM timeseries WHERE collector_id = ts.collector_id) AS last_seen 
     FROM timeseries ts";
-    Json(sqlx::query_as::<_, Collector>(SQL)
-        .fetch_all(&pool)
-        .await
-        .unwrap())
+    Json(
+        sqlx::query_as::<_, Collector>(SQL)
+            .fetch_all(&pool)
+            .await
+            .unwrap(),
+    )
 }
 
-pub async fn collector_data(Extension(pool): Extension<sqlx::SqlitePool>, uuid: Path<String>) -> Json<Vec<DataPoint>> {
-    let rows = sqlx::query_as::<_, DataPoint>("SELECT * FROM timeseries WHERE collector_id = ? ORDER BY received")
-        .bind(uuid.as_str())
-        .fetch_all(&pool)
-        .await
-        .unwrap();
+pub async fn collector_data(
+    Extension(pool): Extension<sqlx::SqlitePool>,
+    uuid: Path<String>,
+) -> Json<Vec<DataPoint>> {
+    let rows = sqlx::query_as::<_, DataPoint>(
+        "SELECT * FROM timeseries WHERE collector_id = ? ORDER BY received",
+    )
+    .bind(uuid.as_str())
+    .fetch_all(&pool)
+    .await
+    .unwrap();
 
     Json(rows)
 }

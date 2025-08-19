@@ -23,7 +23,7 @@ pub async fn data_collector(cnn: Pool<Sqlite>) -> anyhow::Result<()> {
 async fn new_connection(
     mut socket: TcpStream,
     address: SocketAddr,
-    cnn: Pool<Sqlite>, 
+    cnn: Pool<Sqlite>,
     // every connection needs to talk to database;
     // if run out of connection there will be some delay involved waiting for the next one to be available becoming self pacing
     // have to make sure that the database is up for the job
