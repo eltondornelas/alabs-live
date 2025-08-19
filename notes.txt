@@ -1,0 +1,81 @@
+# Which of the following best describes the purpose of lifetimes in Rust?
+To ensure that references always point to valid data and prevent dangling references.
+Lifetimes are a mechanism in Rust to ensure that references (pointers) always refer to data that is still valid, preventing a common source of errors known as dangling references. They do not directly manage memory allocation, which is handled by Rust's ownership system and the Drop trait.
+
+# What is the primary difference between Rc<T> and Arc<T> in Rust?
+Rc<T> provides shared ownership of data in a single-threaded environment, while Arc<T> is safe to use across multiple threads.
+Rc<T> (Reference Counted) is used for shared ownership in single-threaded scenarios. Arc<T> (Atomic Reference Counted) is the thread-safe version that uses atomic operations to manage the reference count, making it suitable for sharing data across multiple threads.
+
+# When might you need to use the unsafe keyword in Rust?
+When the Rust compiler can't guarantee memory safety, such as when working with raw pointers or calling foreign functions.
+The unsafe keyword is used to bypass Rust's normal safety guarantees for certain low-level operations where the compiler cannot verify safety. This includes dereferencing raw pointers, calling functions written in other languages via FFI, and accessing mutable static variables. unsafe code is not inherently dangerous but requires the programmer to manually ensure memory safety.
+
+# What is a mutex in the context of concurrent Rust programming?
+A type of atomic variable that allows for lock-free, concurrent access to shared data.
+A mutex (mutual exclusion) is a concurrency primitive that protects shared data by allowing only one thread to hold the lock and access the data at any given time. This prevents race conditions and ensures data consistency.
+
+# What is mutex poisoning in Rust?
+An error that occurs when a thread holding a mutex panics, leaving the mutex in an unusable state unless the data is recovered.
+Mutex poisoning happens when a thread that holds a lock on a mutex panics. This can leave the data protected by the mutex in an inconsistent or corrupted state. Rust marks the mutex as "poisoned," preventing other threads from acquiring it unless they explicitly handle the potential data corruption.
+
+# What is the purpose of the async and await keywords in Rust?
+To create and handle asynchronous tasks, allowing non-blocking operations.
+The async keyword is used to define asynchronous functions, which can be paused and resumed. The await keyword is used inside async functions to pause execution until a Future completes, allowing other tasks to make progress without blocking the current thread.
+
+# What is the role of a Tokio Runtime in asynchronous Rust?
+It manages asynchronous tasks, allowing for concurrent execution within a single thread or across multiple threads.
+The Tokio Runtime provides the environment necessary to run asynchronous tasks in Rust. It includes a scheduler that manages the execution of futures, allowing for efficient concurrency within a single or multi-threaded context.
+
+# What is pinning in the context of asynchronous Rust?
+Ensuring that the memory location of a value will not move, which is important for self-referential structures and dynamic futures.
+Pinning is a guarantee that the memory address of a value will remain stable. This is crucial for certain types of asynchronous operations, particularly those involving self-referential data structures or when working with futures whose concrete type is not known at compile time (dynamic futures).
+
+# Which of the following is a lock-free data structure for sharing data across threads in Rust?
+DashMap
+DashMap is a crate that provides a lock-free concurrent hash map. Unlike Mutex and RwLock, which use locks to synchronize access, lock-free structures aim to avoid the overhead and potential issues associated with locks.
+
+# What is the purpose of channels in concurrent Rust programming?
+To allow threads to communicate by sending and receiving data.
+Channels are communication primitives that enable threads to exchange data. They consist of a transmitter (sender) and a receiver end. Data sent through a channel is moved from the sender to the receiver, ensuring safe sharing of information between concurrent tasks.
+
+# What is memory fragmentation and which of the following might help mitigate it in specific scenarios?
+The process of allocating memory on the stack; using reference counting.
+Memory fragmentation occurs when allocated memory becomes divided into small, non-contiguous blocks, making it difficult to allocate larger contiguous chunks. Custom allocators, such as gem allocator, can be designed to manage memory in a way that reduces fragmentation in specific use cases.
+
+# What does the repr(packed) attribute do when applied to a struct in Rust?
+It removes any padding between the fields of the struct, potentially reducing its size but possibly impacting performance.
+The repr(packed) attribute tells the Rust compiler to remove any padding bytes that it might normally insert between fields of a struct for memory alignment. While this can reduce the size of the struct in memory, it might lead to slower access times or even compilation issues on certain architectures.
+
+# What is endianness a crucial consideration for when working with binary data?
+When transferring binary data across different computer architectures, as it refers to the byte order.
+Endianness refers to the order in which bytes of a multi-byte data type are stored in computer memory. Different architectures might use big-endian (most significant byte first) or little-endian (least significant byte first) order. When exchanging binary data between systems with different endianness, it's crucial to handle the byte order correctly to ensure data is interpreted as intended.
+
+# What is the primary purpose of the Foreign Function Interface (FFI) in Rust?
+To enable Rust code to interact with code written in other languages like C.
+The Foreign Function Interface (FFI) allows Rust code to call functions written in other programming languages (most commonly C) and for code in other languages to call Rust functions. This enables interoperability and allows Rust to leverage existing libraries and systems written in other languages.
+
+# What is a potential issue that can arise when using reference counting (e.g., Rc or Arc) with data structures that have internal references to themselves or each other?
+Circular references can prevent the reference count from ever reaching zero, leading to memory leaks.
+When objects in a reference-counted system hold references to each other, a cycle can be formed. The reference counts of the objects in the cycle will never drop to zero, even if there are no external references to the cycle, resulting in a memory leak.
+
+# How can weak references (e.g., Weak<T>) help in breaking cycles in reference-counted data structures?
+They do not contribute to the strong reference count, thus allowing the object to be deallocated even if a weak reference exists.
+Weak references are pointers that do not increment the strong reference count of an object. This means that the existence of only weak references to an object will not prevent its deallocation. Weak references are used to break potential cycles in reference-counted structures, but they must be checked for validity before being accessed, as the underlying object might have been dropped.
+
+# What is dynamic dispatch in the context of Rust traits?
+The process of the compiler generating specialized code for each type that implements a generic function. (in my opinion the correct is: Determining at runtime which implementation of a trait method to call when working with trait objects (using the dyn keyword).)
+Dynamic dispatch occurs when you use trait objects (e.g., &dyn MyTrait or Box<dyn MyTrait>). In this case, the specific implementation of a trait method to be executed is determined at runtime based on the concrete type of the object. This is in contrast to static dispatch (used with generics and concrete types), where the implementation is known at compile time.
+
+# What is the purpose of the rayon crate in Rust?
+To simplify parallel processing of iterators using a work-stealing algorithm.
+Rayon is a library that makes it easy to parallelize computations, especially those involving iterators. It provides parallel iterators (par_iter) that automatically distribute the work across multiple threads, often using a work-stealing algorithm for efficient load balancing.
+
+# In the context of the capstone project, why was a binary protocol chosen for communication between the data collectors and the server?
+To make the data human-readable. (in my opinio the correct is: To allow for more efficient and reliable communication by encoding data as bytes, reducing bandwidth usage and including error correction.)
+A binary protocol is a custom-defined way of encoding data as raw bytes. This approach is often chosen for network communication when efficiency (in terms of bandwidth and processing speed) and reliability (through mechanisms like checksums) are important, as demonstrated by the switch from JSON to bin code for bandwidth reduction.
+
+# What is dependency injection as mentioned in the context of the Axum web framework in the thumbnail server example?
+A design pattern where dependencies (like a database connection) are provided to a component without it having to manually create them.
+Dependency injection is a pattern where the dependencies that a component needs (e.g., services, data sources) are passed into it from the outside, rather than the component creating them itself. In the context of Axum and the tower crate, this allows handlers and services to receive necessary resources (like database connections) in a clean and organized manner, improving testability and maintainability.
+
+# https://courses.ardanlabs.com/certificates/nydtvknfho
