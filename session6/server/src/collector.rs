@@ -1,12 +1,14 @@
 use std::net::SocketAddr;
 
-use shared_data::{DATA_COLLECTOR_ADDRESS, decode_v1};
+use shared_data::{CollectorCommandV1, DATA_COLLECTOR_ADDRESS, decode_v1};
+use sqlx::{Pool, Sqlite};
 use tokio::{
     io::AsyncReadExt,
     net::{TcpListener, TcpStream},
 };
 
-pub async fn data_collector() -> anyhow::Result<()> {
+// where the data is coming in
+pub async fn data_collector(cnn: Pool<Sqlite>) -> anyhow::Result<()> {
     // Listen for TCP connections on the data collector address
     let listener = TcpListener::bind(DATA_COLLECTOR_ADDRESS).await?;
 
@@ -14,11 +16,18 @@ pub async fn data_collector() -> anyhow::Result<()> {
     loop {
         // Wait for a new connection
         let (socket, address) = listener.accept().await?;
-        tokio::spawn(new_connection(socket, address));
+        tokio::spawn(new_connection(socket, address, cnn.clone()));
     }
 }
 
-async fn new_connection(mut socket: TcpStream, address: SocketAddr) {
+async fn new_connection(
+    mut socket: TcpStream,
+    address: SocketAddr,
+    cnn: Pool<Sqlite>, 
+    // every connection needs to talk to database;
+    // if run out of connection there will be some delay involved waiting for the next one to be available becoming self pacing
+    // have to make sure that the database is up for the job
+) {
     println!("New connection from {address:?}");
     let mut buf = vec![0u8; 1024]; // 1 KB
     loop {
@@ -32,8 +41,36 @@ async fn new_connection(mut socket: TcpStream, address: SocketAddr) {
             return;
         }
 
-        println!("Received {n} bytes");
+        // println!("Received {n} bytes");
         let received_data = decode_v1(&buf[0..n]);
-        println!("Received data: {received_data:?}");
+        // println!("Received data: {received_data:?}");
+
+        match received_data {
+            (
+                timestamp,
+                CollectorCommandV1::SubmitData {
+                    collector_id,
+                    total_memory,
+                    used_memory,
+                    average_cpu_usage,
+                },
+            ) => {
+                let collector_id = uuid::Uuid::from_u128(collector_id);
+                let collector_id = collector_id.to_string();
+
+                let result = sqlx::query("INSERT INTO timeseries (collector_id, received, total_memory, used_memory, average_cpu) VALUES ($1, $2, $3, $4, $5)")
+                    .bind(collector_id)
+                    .bind(timestamp)
+                    .bind(total_memory as i64)
+                    .bind(used_memory as i64)
+                    .bind(average_cpu_usage)
+                    .execute(&cnn)
+                    .await;
+
+                if result.is_err() {
+                    println!("Error inserting data into the database: {result:?}");
+                }
+            }
+        }
     }
 }

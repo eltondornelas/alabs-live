@@ -5,5 +5,11 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.99"
+axum = "0.8.4"
+dotenv = "0.15.0"
+futures = "0.3.31"
+serde = { version = "1.0.219", features = ["derive"] }
 shared_data = { path = "../shared_data" }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-native-tls", "sqlite"] }
 tokio = { version = "1.47.1", features = ["full"] }
+uuid = "1.18.0"
