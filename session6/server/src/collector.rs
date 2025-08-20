@@ -1,9 +1,9 @@
 use std::net::SocketAddr;
 
-use shared_data::{CollectorCommandV1, DATA_COLLECTOR_ADDRESS, decode_v1};
+use shared_data::{decode_v1, encode_response_v1, CollectorCommandV1, CollectorResponseV1, DATA_COLLECTOR_ADDRESS};
 use sqlx::{Pool, Sqlite};
 use tokio::{
-    io::AsyncReadExt,
+    io::{AsyncReadExt, AsyncWriteExt},
     net::{TcpListener, TcpStream},
 };
 
@@ -69,6 +69,10 @@ async fn new_connection(
 
                 if result.is_err() {
                     println!("Error inserting data into the database: {result:?}");
+                } else {
+                    let ack = CollectorResponseV1::Ack(0);
+                    let response_bytes = encode_response_v1(ack);
+                    socket.write_all(&response_bytes).await.unwrap();
                 }
             }
         }

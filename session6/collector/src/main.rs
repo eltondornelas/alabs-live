@@ -1,6 +1,6 @@
-use shared_data::{CollectorCommandV1, DATA_COLLECTOR_ADDRESS, encode_v1};
+use shared_data::{decode_response_v1, encode_v1, CollectorCommandV1, CollectorResponseV1, DATA_COLLECTOR_ADDRESS};
 use std::collections::VecDeque;
-use std::io::Write;
+use std::io::{Read, Write};
 use std::{sync::mpsc::Sender, time::Instant};
 use thiserror::Error;
 
@@ -23,6 +23,8 @@ pub enum CollectorError {
     UnableToConnect,
     #[error("Sending the data failed")]
     UnableToSend,
+    #[error("Receiving data failed")]
+    UnableToReceive,
 }
 
 pub fn collect_data(tx: Sender<CollectorCommandV1>, collector_id: u128) {
@@ -101,7 +103,7 @@ pub fn send_command(bytes: &[u8]) -> Result<(), CollectorError> {
     Ok(())
 }
 
-pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
+/* pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
     // println!("Queue {} bytes", queue.len());
 
     // Connect
@@ -113,6 +115,39 @@ pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
         if stream.write_all(&command).is_err() {
             queue.push_front(command);
             return Err(CollectorError::UnableToSend);
+        }
+    }
+
+    Ok(())
+} */
+
+pub fn send_queue(queue: &mut VecDeque<Vec<u8>>) -> Result<(), CollectorError> {
+    // Connect
+    let mut stream = std::net::TcpStream::connect(DATA_COLLECTOR_ADDRESS)
+        .map_err(|_| CollectorError::UnableToConnect)?;
+
+    // Send every queue item
+    let mut buf = vec![0u8; 512];
+    while let Some(command) = queue.pop_front() {
+        
+        if stream.write_all(&command).is_err() {
+            queue.push_front(command);
+            return Err(CollectorError::UnableToSend);
+        }
+
+        let bytes_read = stream.read(&mut buf).map_err(|_| CollectorError::UnableToReceive)?;
+        if bytes_read == 0 {
+            queue.push_front(command);
+            return Err(CollectorError::UnableToReceive);
+        }
+
+        let ack = decode_response_v1(&buf[0..bytes_read]);
+        if ack != CollectorResponseV1::Ack(0) {
+            queue.push_front(command);
+            return Err(CollectorError::UnableToReceive);
+        } else {
+            // Comment this out for production
+            println!("Ack received");
         }
     }
 

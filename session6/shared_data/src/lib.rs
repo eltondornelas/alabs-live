@@ -5,6 +5,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub const DATA_COLLECTOR_ADDRESS: &str = "127.0.0.1:9004";
 const MAGIC_NUMBER: u16 = 1234;
 const VERSION_NUMBER: u16 = 1;
+const CONFIG_STANDARD: bincode::config::Configuration = bincode::config::standard();
 
 // helper function by rust documentation, to convert the current time into unix time
 fn unix_now() -> u32 {
@@ -25,12 +26,25 @@ pub enum CollectorCommandV1 {
     },
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Encode, Decode)]
+pub enum CollectorResponseV1 {
+    Ack(u32),
+}
+
+pub fn encode_response_v1(command: CollectorResponseV1) -> Vec<u8> {
+    bincode::encode_to_vec(command, CONFIG_STANDARD).unwrap()
+}
+
+pub fn decode_response_v1(bytes: &[u8]) -> CollectorResponseV1 {
+    bincode::decode_from_slice(bytes, CONFIG_STANDARD).unwrap().0
+}
+
 pub fn encode_v1(command: &CollectorCommandV1) -> Vec<u8> {
     // let json = serde_json::to_string(&command).unwrap();
     // let json_bytes = json.as_bytes();
     // let crc = crc32fast::hash(&json_bytes);
     // let payload_size = json_bytes.len() as u32;
-    let payload_bytes = bincode::encode_to_vec(command, bincode::config::standard()).unwrap();
+    let payload_bytes = bincode::encode_to_vec(command, CONFIG_STANDARD).unwrap();
     let crc = crc32fast::hash(&payload_bytes);
     let payload_size = payload_bytes.len() as u32;
     let timestamp = unix_now();
@@ -71,7 +85,7 @@ pub fn decode_v1(bytes: &[u8]) -> (u32, CollectorCommandV1) {
     assert_eq!(crc, computed_crc);
 
     // Decode the payload
-    (timestamp, bincode::decode_from_slice(payload, bincode::config::standard()).unwrap().0)
+    (timestamp, bincode::decode_from_slice(payload, CONFIG_STANDARD).unwrap().0)
     // (timestamp, serde_json::from_slice(payload).unwrap())
 }
 
@@ -94,6 +108,14 @@ mod tests {
         
         assert_eq!(decoded, command);
         assert!(timestamp > 0);
+    }
+
+    #[test]
+    fn test_encode_decode_response() {
+        let response = CollectorResponseV1::Ack(123);
+        let encoded = encode_response_v1(response.clone());
+        let decoded = decode_response_v1(&encoded);
+        assert_eq!(decoded, response);
     }
 }
 
