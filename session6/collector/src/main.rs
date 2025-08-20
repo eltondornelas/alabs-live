@@ -190,3 +190,15 @@ fn main() {
 // the client crashes in the moment the server goes away, can never assume that server will be there
 // cargo add thiserror
 // cargo add uuid -F v4 -F fast-rng
+
+// https://github.com/thebracket/ArdanUltimateRust-5Days/blob/main/05-Server/SmallerCollector.md
+// cargo build --release; ls -la ../../target/release/collector
+// https://doc.rust-lang.org/cargo/reference/profiles.html#opt-level
+// rustup toolchain install nightly
+// rustup component add rust-src --toolchain nightly
+// rustc -vV 
+// cargo +nightly build -Z build-std=std,panic_abort -Z build-std-features=panic_immediate_abort --target x86_64-unknown-linux-gnu --release
+// ls -la ../../target/x86_64-unknown-linux-gnu/release/collector
+// cargo install bloat
+// cargo bloat
+// cargo tree

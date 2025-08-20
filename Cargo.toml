@@ -62,3 +62,15 @@ members = [
     "session6/server", 
     "session6/shared_data",
 ]
+
+[profile.release]
+# opt-level = "s" # 774101
+# opt-level = "z" # 813416
+# opt-level = 0 # 1446416
+# opt-level = 1 # 808992
+opt-level = 2 # 770576
+# opt-level = 3 # 786440
+strip = true # 631544 -> strip out debugging information, symbols... removing lot of information
+lto = true # 574208 -> link time optimization (optmize crates)
+codegen-units = 1 # 566016
+panic = "abort" # 541440
