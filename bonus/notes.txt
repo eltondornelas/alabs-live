@@ -1,0 +1,20 @@
+# Which of the following is a primary benefit of implementing bi-directional communication in a TCP connection, as discussed in "1.0 - Bi-Directional Communication.txt"?
+Ability to acknowledge data receipt and send commands
+The key advantage of bi-directional communication is the ability to confirm data receipt through acknowledgments (ACKs) and to send commands back to the collector device. This allows for functionalities such as controlling devices (e.g., turning a light on or off) or instructing the device to perform specific actions like sleeping or upgrading.Ability to acknowledge data receipt and send commands
+
+# Which optimization level in cargo.toml is specifically mentioned for prioritizing smaller binary sizes in "1.3 - Giving the Collector a Diet.txt"?
+Optimization level S
+According to "1.3 - Giving the Collector a Diet.txt", optimization level S is the default option for prioritizing smaller binary sizes during compilation. While optimization level Z is also mentioned as potentially yielding smaller sizes, level S is explicitly noted as the primary setting for this purpose.
+
+# When optimizing file reading in Rust, which method from "1.5 - Optimizing File Reading .txt" provides the most significant performance improvement for large files by mapping the file handle to an area in virtual memory?
+Using M-Map (memory mapping)
+M-Map (memory mapping) offers substantial performance gains when reading large files. It allows the operating system to handle memory swapping and provides fast access to file content as if it were a large array of bytes. While buffered readers improve memory usage, M-Map significantly reduces read times for gigabyte-sized files.
+
+
+# In the context of adapting files in flight using Tokyo, what is the primary role of stream adapters, as explained in "1.6 - Adapting Files In Flight.txt"?
+To modify file content in real-time during streaming
+Stream adapters are designed to take a stream as input, transform its content, and output a modified stream. This enables real-time data manipulation, such as converting text to uppercase or adding watermarks to images, as the data is being transmitted.
+
+# According to "1.3 - Giving the Collector a Diet.txt," which tool helps analyze where the bytes in a compiled Rust program are allocated, aiding in the identification and removal of unnecessary dependencies to reduce binary size?
+Cargo Bloat
+Cargo Bloat is a tool used to analyze the size of different components in a compiled Rust program. By identifying which dependencies or functions consume the most space, developers can make informed decisions about which parts of their code to optimize or remove, thus reducing the overall binary size.
