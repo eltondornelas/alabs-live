@@ -843,6 +843,17 @@ name = "ffi"
 version = "0.1.0"
 
 [[package]]
+name = "file_adapt"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "pin-project-lite",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+]
+
+[[package]]
 name = "file_read"
 version = "0.1.0"
 dependencies = [
@@ -3302,6 +3313,7 @@ dependencies = [
  "futures-core",
  "pin-project-lite",
  "tokio",
+ "tokio-util",
 ]
 
 [[package]]
