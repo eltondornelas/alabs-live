@@ -18,3 +18,39 @@ Stream adapters are designed to take a stream as input, transform its content, a
 # According to "1.3 - Giving the Collector a Diet.txt," which tool helps analyze where the bytes in a compiled Rust program are allocated, aiding in the identification and removal of unnecessary dependencies to reduce binary size?
 Cargo Bloat
 Cargo Bloat is a tool used to analyze the size of different components in a compiled Rust program. By identifying which dependencies or functions consume the most space, developers can make informed decisions about which parts of their code to optimize or remove, thus reducing the overall binary size.
+
+## Minimize Cloning
+When you're first getting into Rust, it's really easy to abuse clone(). It's pretty fast (slowing down the more complex your structure is). 
+With the move semantics and the borrow checker, it's very tempting to clone a LOT. The optimizer will minimize the overhead quite a bit, but when you can avoid cloning - it's worth it.
+The exception being types that are designed to be cloned, such as 'Rc' or connection pools!
+If you find yourself cloning things a lot, so you can fan data out in lots of directions---it's usually a sign that your design needs some work. 
+Should you be destructuring and moving the relevant data? Should you be using a shared type (like an Rc/Arc) and sharing the data? 
+Maybe you should look at reducing the number of &mut and use references?
+
+With giant datasets cloning to get a complete copy, will slow the system, ideal is to avoid as many clone as possible by taking a reference
+but if really needs to get ownership to send somewhere else, maybe use Arc or Rc is the better choice
+
+## Don't Emulate Object Oriented Programming
+https://github.com/thebracket/Ardan-NR-2023-07/blob/main/Day4/OOPs.md
+
+## Floating Point Numbers
+Rust's floating point types are full IEEE 754 floating-point representations---including inaccuracy.
+    It's very easy to get a nearly-right but not accurate number. Checking equality is dangerous!
+
+In particular, don't ever store money in a floating point number. Your accountants won't like it.
+You can use the 'approx_crate' for some helpful macros to help check approximate equality.
+You can use the 'bigdecimal' to store large decimals without inequality, and is supported by Serde, Postgres and other crates.
+
+## TANSTAAFL - There Aint No Such Thing As A Free Lunch
+https://github.com/thebracket/Ardan-NR-2023-07/blob/main/Day4/TANSTAAFL.md
+Rust is fast, and you often get performance benefits relative to other languages just for using it. But everything is a trade-off:
+    You can trade developer time optimizing vs. execution time and server cost.
+    You can trade code readability vs. performance in some cases.
+    You can trade compilation time vs. execution time.
+Generics: Every time you make a generic type or function, the compiler will replace it at compile time with concrete implementations matching what you actually used.
+    This adds to your compile times, and can make for bigger binaries.
+Macros: Macros are slow to compile, but can make coding much more pleasant. Use macros sparingly.
+    Don't redefine large swathes of syntax because you can---do it when it makes the interface objectively better.
+
+## YAGNI - You Aint Gonna Need It
+

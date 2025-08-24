@@ -57,6 +57,14 @@ fn main() {
     //*********************************************************//
 
     // Working with Data
+    /*
+        Iterators could be a class unto themselves. It's always worth looking at the operations offered by iterators. 
+            'map' can be used to transform data on its way through the pipeline. 'filter_map' can combine filtering and mapping into a single operation. 
+            'all', 'any' can be used to see if a predicate matches all or any element. 'skip' and 'nth' let you navigate within the iterator.
+            'fold' can apply an accumulator, 'reduce' can shrink your data. With 'chain' and 'zip' you can combine iterators.
+        In some cases, it's worth learning to make your own iterators. It's relatively simple (very similar to the stream we made).
+        Remember, iterators don't yield. You can turn an iterator into a stream with a helper function from 'tokio-streams' (and also 'futures') if you do need to yield at each step in an async program.
+     */
     let now = std::time::Instant::now();
     const MAX:u32 = 200000;
     let mut count = 0;
