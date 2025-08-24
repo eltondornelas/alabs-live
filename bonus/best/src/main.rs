@@ -1,4 +1,5 @@
 // #![warn(clippy::pedantic)]
+// #![warn(missing_docs)]
 
 #[allow(dead_code)]
 fn ignore_me() {
@@ -28,5 +29,15 @@ fn main() {
  * cargo clippy
  * #![warn(clippy::pedantic)]  // mini code review; #! = global
  * #[allow(dead_code)]
- * 
+ *
+ * https://github.com/thebracket/Ardan-NR-2023-07/blob/main/Day4/Documentation.md 
+ * #![warn(missing_docs)] // good for libs
+ * //! -> syntax indicates a scope-level comment
+ * tests created in documented scopes will be tested in compile-time
+ * /// -> syntax for function and structure
+ * https://rust-lang.github.io/api-guidelines/documentation.html
+ * Rust RFC 1574
+ * cargo doc --open --no-deps
+ * cargo install spellcheck
+ * cargo spellcheck
 */
