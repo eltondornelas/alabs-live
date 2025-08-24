@@ -6,6 +6,7 @@ edition = "2024"
 [workspace]
 members = [ 
     "bonus/best", 
+    "bonus/favor_iterators", 
     "bonus/file_adapt", 
     "bonus/file_read", 
     "session1/authentication",

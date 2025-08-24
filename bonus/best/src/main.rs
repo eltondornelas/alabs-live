@@ -18,7 +18,7 @@ fn main() {
     }
 }
 
-/*
+/* Tooling
  * cargo fmt --check --all
  
  * can create a rustfmt.toml
@@ -40,4 +40,24 @@ fn main() {
  * cargo doc --open --no-deps
  * cargo install spellcheck
  * cargo spellcheck
+ * 
+ * cargo tree
+ * cargo bloat
+ * cargo vendor  // axum = "=0,6.19"; in big projects can take a time
+ * 
+ * cargo publish // crates.io
+ * https://github.com/thebracket/Ardan-NR-2023-07/blob/main/Day4/ManageDependencies.md
+ * 
+ * cargo install cargo-audit
+ * cargo audit // to check vulnerabilities
+ * 
+ * cargo install cargo-outdated
+ * cargo outdated // check outdated dependencies (-w for whole workspace)
+ * cargo update
+ *
+ * https://github.com/thebracket/Ardan-NR-2023-07/blob/main/Day4/Deny.md
+ * cargo install cargo-deny 
+ * cargo deny init
+ * cargo deny // better use cargo audit
+ * cargo deny check licenses
 */
