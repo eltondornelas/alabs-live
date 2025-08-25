@@ -12,7 +12,7 @@ fn main() {
         println!(".)")
     }
 
-    #[rustfmt::skip]  // skipping formatting
+    #[rustfmt::skip]
     mod section {
         const N:i32 = 1;
     }
@@ -20,6 +20,7 @@ fn main() {
 
 /* Tooling
  * cargo fmt --check --all
+ * #[rustfmt::skip]  // skip formatting
  
  * can create a rustfmt.toml
  

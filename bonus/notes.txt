@@ -54,3 +54,107 @@ Macros: Macros are slow to compile, but can make coding much more pleasant. Use 
 
 ## YAGNI - You Aint Gonna Need It
 
+# What tool does Cargo include for code formatting, and what is strongly recommended regarding its use? 
+cargo fmt; Strongly recommend going with the default and using it all the time.
+The sources explicitly state, "Cargo includes a code formatter. And just like Go includes a code formatter, I strongly recommend going with the default cargo format. Make sure that you use it all the time."
+
+# According to the lessons, why is running cargo fmt before committing recommended? 
+To avoid messing up your PR and obscuring changes in the commit chain if someone else formats it. 
+The lessons recommend running cargo fmt before every commit "Because otherwise, you wind up committing ugly code. Somebody else formats it. You just messed up your PR because now your format formatted code written by other people. It's no longer obvious in your commit chain, which file you're editing".
+
+# What is cargo clippy, and what is its primary function? 
+A linter; It looks at your Rust code and makes suggestions for improvement.
+Clippy is defined as "a linter. That is, it looks at your Rust code, makes suggestions a way to improve it."
+
+# According to the lessons, what does adding #[warn(missing_docs)] at the top level of a lib.rs file do? 
+Warns you that public-facing modules, functions, and types need documentation according to official guidelines.
+Adding #[warn(missing_docs)] "will bring you up to the official Rust published code guidelines that it will warn you that your modules need to announce what they do. And public-facing functions and types need to have some documentation".
+
+# Which tool can help you avoid licensing incompatibilities, such as accidentally including viral GPL code in a proprietary project? 
+cargo deny
+Lessons state, "Cargo deny can actually check a lot of things, including some CVEs... But what cargo deny can do is it can make the lawyers in your company happy by allowing you to specify what licenses are OK to work with". It specifically mentions using it to avoid GPL licenses because they are viral.
+
+
+# According to the lessons, when is Clone considered a "code smell" in Rust? 
+When used on a complicated data type containing tons of data, potentially leading to slow deep copy operations.
+While cloning isn't always a smell, it "can start to get very slow, because you have-- cloning is a deep copy operation. It copies everything. It copies all of the collections that are inside." Using it on large, complex types where speed is an issue is highlighted as the concern.
+
+# Why do the sources advise against extensively emulating Object-Oriented Programming (OOP) paradigms in Rust?
+It can lead to unnecessary pain, heartache, and code that is messy, slow, and doesn't look like idiomatic Rust.
+Lessons states, "Rust really isn't an object-oriented language. And if you approach it as one, you are going to give yourself a lot of unnecessary pain and heartache." Source adds that it "starts to get slow. It starts to get really just nasty to read. And it doesn't look like Rust code anymore".
+
+# According to the lessons, what is the primary advantage of favoring small functions in Rust? 
+They are easier to read, understand, test, and compose, and the compiler can often optimize them better.
+The lessons list several advantages of small functions: "easier to read", "easier to test", "easier to compose", and "the compiler can usually do a better job optimizing". While inlining might happen, it's not guaranteed or the only benefit.
+
+# What cautionary advice is given regarding the use of floating-point numbers for handling monetary values? 
+Never store money in a floating-point number due to potential loss of precision, recommending types like bigdecimal instead.
+The lessons emphatically state, "don't ever, ever, ever store money in a floating point number. Your accountants are gonna be upset when somebody's balance gets high enough that you start losing precision and a few pennies start to go missing." They recommend using a fixed-point type like bigdecimal instead.
+
+# When writing platform or feature-specific code in Rust, what approach is recommended to manage complexity? 
+Build an abstraction layer using traits or generic types, with platform-specific implementations in separate modules conditionally compiled with #cfg tags. 
+The recommended approach is to "build an abstraction layer where you export the same type with the same interface from multiple modules, write that type to internally use the platform specific." This often involves a "shared trait that they all derive from" and using #cfg tags to "only build that one module in" or "import the whole file". Using #cfg on individual lines within a function is explicitly discouraged as it "quickly becomes spaghetti, utterly unreadable".
+
+
+# The acronym TANSTAAFL in programming represents what concept? 
+There Ain’t No Such Thing As A Free Lunch; Everything involves trade-offs.
+The acronym TANSTAAFL is explained as "there ain't no such thing as a free lunch." The sources then elaborate on this, explaining that "every single one of the trade-offs that we've talked about... is, in fact, a trade-off. It's not a free lunch." These trade-offs include performance vs. compile time, developer time vs. execution cost, and readability vs. performance.
+
+# The acronym YAGNI stands for "You Ain't Gonna Need It". According to the sources, what is the core principle behind YAGNI?
+Focus on writing only the code that is currently needed and required for the project
+"Yagney, you ain't going to need it. Don't write the things that you don't need." An anecdote illustrates this by showing how extensive functionality was built but only one function was used. The lesson is to "Focus in on what your code needs to do" and "Focus on writing what you need, finish the project."
+
+# Where do the sources suggest that integration bugs and communication issues are most frequently found in large or distributed systems?
+At "domain boundaries" or connections between different chunks of code or systems.
+The lessons explicitly state, "domain boundaries are where you find the bugs." and "where you find the bugs is almost always where team one's code and team two's code connect." This is likened to "doors and corners".
+
+# According to the lesson, how can you improve Rust compile times? 
+Invest in fast storage and RAM, use workspaces, break code into smaller module files or separate crates.
+Several methods to improve compile times are mentioned: "get fast storage", "Upgrading my laptop's RAM made a nice difference.", "use work spaces", "code that you break up into lots of small module files is going to compile a lot faster", and "Break it off into its own crate or library".
+
+# Which of the following is explicitly recommended as a book that will "make you a better programmer than any language"?
+The Pragmatic Programmer or Code Complete.
+The lesson states, "I highly recommend reading some generic books, Code Complete, The Pragmatic Programmer. Both of those books will make you a better programmer than any language."
+
+
+# How can you tell cargo fmt to skip formatting a specific section of code, such as a module, if you prefer a different layout for readability? 
+Use the attribute #[rustfmt::skip] before the section
+If you have a section of code you do not want cargo fmt to format, such as constants you like to align, you can use the attribute #[rustfmt::skip] before that section (e.g., a module or a function). Code sections marked with this directive will not be automatically formatted or flagged by cargo fmt --check.
+
+# What is the effect of enabling Clippy's pedantic mode? 
+It enables stricter, more detailed warnings and suggestions
+Enabling Clippy's pedantic mode (#[warn(clippy::pedantic)]) turns on Clippy's "super picky mode". This mode gives a lot more warnings and suggestions, getting "really smart about things that you could improve".
+
+# Which command is used to generate HTML documentation for a Rust project, often looking similar to the standard Rust documentation site? 
+cargo doc
+You can run cargo doc to generate a complete HTML documentation site for your project, which will appear in the target/doc directory. This tool is the same one used to generate the standard Rust documentation site.
+
+# What does a code block within Rust documentation comments (using backticks ``) enable by default when cargo test is run?
+The code block is tested to ensure it compiles and executes
+When you include example code in documentation comments using backticks, cargo test will automatically test these code blocks to ensure they compile and execute. This helps keep your code and documentation aligned, as a documentation test will break if you change the code and the example is no longer valid.
+
+# How can you specify that your project should use an exact version of a dependency, preventing cargo update from upgrading it to a newer compatible version? 
+Use an explicit equality requirement (=) in Cargo.toml 
+To "pin" your dependencies to an exact version, you should use an explicit equality requirement (=) in your Cargo.toml file, for example, axem = "0.6.19". This ensures that when you build, Cargo fetches that specific version and won't pull in updates.
+
+# What does the cargo vendor command accomplish?
+It downloads all necessary dependencies and stores them locally, allowing for offline builds
+The cargo vendor command downloads all required dependencies for your project and places them in a local vendor directory, adjusting your build to use these local copies instead of fetching them from the internet. This enables offline builds and helps ensure repeatable builds by pinning the project to the vendored dependencies.
+
+# What is a recommended way to manage internal company Rust crates that are not published to crates.io?
+Reference them using a Git repository path or a local file system path in Cargo.toml 
+For internal crates not published to crates.io, recommended options include sharing them via a Git repository (using git = "path/to/repo") or referencing them by a local file system path (using path = "../some_other_library").
+
+# Which tool is recommended for checking your project's dependencies for known security vulnerabilities (CVEs)? 
+cargo audit (also integrated into GitHub Security)
+cargo audit is recommended for checking dependencies for known security vulnerabilities (CVEs). It scans your workspace against a list of known vulnerabilities and is also integrated into GitHub's security settings. While cargo deny can also check CVEs, cargo audit is often preferred for this specific task as it is described as slimmer and ties nicely into GitHub.
+
+# Which tool helps identify dependencies in your project that have newer versions available, listing potential updates? 
+cargo outdated 
+cargo outdated is presented as the most common tool to identify dependencies that have newer versions available. Running this command will tell you which dependencies can be updated.
+
+# According to the source, why is excessive use of clone() on large data types considered a potential code smell?
+Cloning performs a deep copy, which can be slow and consume significant memory for large data structures
+While cloning isn't always a code smell (e.g., for types like Arc or Rc), using clone() on a complicated data type with lots of nested data is problematic because cloning is a deep copy operation. This means it copies everything, which can start to get very slow and should be avoided if speed is important.
+
+
